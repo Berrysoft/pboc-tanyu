@@ -18,6 +18,14 @@ from ._initials import mc_initials
 from ._parser import Syllable, parse_syllable
 from ._position import mc_position
 from ._rhyme import mc_rhyme
+from .convert import convert_tsv
 
-__all__ = ["parse_syllable", "mc_initials", "mc_grade", "mc_rhyme", "mc_position"]
-__version__ = "0.8.0"
+__all__ = [
+    "parse_syllable",
+    "mc_initials",
+    "mc_grade",
+    "mc_rhyme",
+    "mc_position",
+    "convert_tsv",
+]
+__version__ = "0.9.2"

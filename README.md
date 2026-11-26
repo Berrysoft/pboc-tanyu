@@ -2,10 +2,12 @@
 
 解析 **PBOC**（“基于文献的上古汉语”）的 IPA 拟音，并由音节推导中古声母。
 
-包只导出五个函数：
+包导出六个函数：
 
 ```python
-from pboc_tanyu import mc_grade, mc_initials, mc_position, mc_rhyme, parse_syllable
+from pboc_tanyu import (
+    convert_tsv, mc_grade, mc_initials, mc_position, mc_rhyme, parse_syllable,
+)
 ```
 
 - `parse_syllable(ipa)`：把一条拟音拆成
@@ -17,6 +19,8 @@ from pboc_tanyu import mc_grade, mc_initials, mc_position, mc_rhyme, parse_sylla
 - `mc_rhyme(syllable)`：只接受 `Syllable`，返回 **`(開/合, 韵)`**。
 - `mc_position(syllable)`：只接受 `Syllable`，返回
   `声母 + 开合 + 韵等 + 韵母 + 声调` 的音韵地位字符串。
+- `convert_tsv(text)`：把“字 + PBOC 注音”的 TSV 转成 AWs-363 的
+  `字(音韵地位)` 文本。
 
 ## 安装
 
@@ -304,6 +308,29 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
 另外，L 系 `l` + 非三等 + 无 -r- + `-əps` 单独按 *-its 一支处理，归四等開齊
 （`lˤəps`）；这是规则表之外的显式补充，因为 `-əps > -us` 只适用于 T/N/TS，
 不适用于近音 L。
+
+## 转换器 `convert_tsv`
+
+输入是**没有表头**的 TSV：
+
+```text
+字<TAB>PBOC 注音
+```
+
+第二列可以省略（表示该字没有注音）。输出每行 `字(音韵地位)`，
+没有注音的行只输出字符：
+
+```python
+>>> from pboc_tanyu import convert_tsv
+>>> convert_tsv("日\tnəm\n端\ttˤa\n")
+'日(日開三侵平)\n端(端合一模平)\n'
+>>> convert_tsv("日\tnəm\n\n，\n")
+'日(日開三侵平)\n\n，\n'
+```
+
+- 保留输入的行结构：空行、末尾换行都会保留；需要连续文本时把换行去掉即可。
+- 第一列必须是单个字符；注音无法解析时，错误信息会带行号。
+- 每行超过两列会报错。
 
 ## 数据来源
 
