@@ -18,4 +18,4 @@ from ._parser import Syllable, parse_syllable
 from ._rhyme import mc_rhyme
 
 __all__ = ["parse_syllable", "mc_initials", "mc_grade", "mc_rhyme"]
-__version__ = "0.7.0"
+__version__ = "0.7.1"

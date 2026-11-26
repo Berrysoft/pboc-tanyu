@@ -13,6 +13,9 @@
 IPA 韵尾。声母类型由中古声母归并而来；``is_w`` 表示 kw、kʰw、gw、ŋw、
 ʔw、w、ẘ 这类合口化声母。
 
+另有一条表外补充：L 系 ``l`` + 非三等 + 无 -r- + ``-əps`` 走 *-its 一支，
+归四等開齊（``lˤəps``）；``-əps > -us`` 只适用于 T/N/TS，不适用于近音 L。
+
 规则表由 ``dict.xlsx`` 的《小韻表》生成；不能覆盖的例外见
 ``rhyme_exceptions.tsv``。韵目以《切韵》为准：平/上/去用平声韵目，入声用
 入声韵目；寒合作桓、歌合作戈、真合作諄。
@@ -70,6 +73,11 @@ def mc_rhyme(syllable: Syllable) -> tuple[str, str]:
         ('合', '虞')
     """
     initial, phar, has_r, vowel, coda, _tone, marker = coerce_syllable(syllable)
+
+    # L 系 *-əps 走 *-its 一支：lˤəps > 四等開齊。
+    if initial == "l" and phar and not has_r and vowel == "ə" and coda == "" and marker == "ps":
+        return ("開", "齊")
+
     effective_coda = "s" if marker in {"s", "ps"} else coda
     group = _GROUP.get(mc_initials(syllable))
     if group is None:

@@ -36,6 +36,8 @@ CASES: list[tuple[str, int]] = [
     ("kˤən", 1),
     ("tˤəps", 1),
     ("tˤə", 1),
+    # L 系 *-əps 走 *-its：四等
+    ("lˤəps", 4),
 ]
 
 
