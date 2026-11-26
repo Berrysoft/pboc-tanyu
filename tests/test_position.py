@@ -12,6 +12,7 @@ def _s(ipa: str):
 CASES: list[tuple[str, str]] = [
     # 唇音：不写呼
     ("pe", "幫三A支平"),
+    ("paj", "幫三B支平"),
     ("praŋ", "幫三B庚平"),
     ("pa", "幫三C虞平"),
     ("bˤəŋ", "並一登平"),

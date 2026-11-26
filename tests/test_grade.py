@@ -15,6 +15,9 @@ CASES: list[tuple[str, str]] = [
     ("tra", "三"),
     ("tia", "三"),
     ("pe", "三A"),
+    ("paj", "三B"),
+    ("pre", "三B"),
+    ("praj", "三B"),
     ("praŋ", "三B"),
     ("pa", "三C"),
     # 有咽化 + r -> 二等

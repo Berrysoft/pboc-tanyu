@@ -40,6 +40,9 @@ _BASE_RHYME = {
 #: 重紐 AB 類的韻。云母沒有 A 類，遇到這些韻一律作 B 類。
 _AB_RIMES = frozenset({"支", "脂", "祭", "真", "仙", "宵", "幽", "侵", "鹽"})
 
+#: 鈍音聲母：只有這些聲母在三等分 A/B/C。
+_DUN = frozenset("幫滂並明見溪羣疑影曉匣云")
+
 #: 等韻搭配：某些韻本身沒有二等，ˤ + -r- 不能機械地判作二等。
 _FIRST_ONLY = frozenset({"冬", "模", "泰", "灰", "咍", "魂", "痕", "寒", "豪", "唐", "登", "侯", "覃", "談"})
 _THIRD_ONLY = frozenset({
@@ -51,12 +54,19 @@ _FIRST_THIRD = frozenset({"東", "歌"})
 
 
 def _san_grade(syllable: Syllable, has_r: bool) -> str:
-    """三等：按 r、声母类型、韵查 A/B/C 表。"""
+    """三等：重紐 AB 韻按有無 -r- 與前元音分 A/B，其餘查 A/B/C 表。"""
     initial = mc_initials(syllable)
     rhyme = mc_rhyme(syllable)[1]
     base_rhyme = _BASE_RHYME.get(rhyme, rhyme)
-    if initial == "云" and base_rhyme in _AB_RIMES:
+
+    # 鈍音 + 重紐 AB 韻：A ⇔ 無 -r- 且前元音（云母永遠 B）。
+    if initial in _DUN and base_rhyme in _AB_RIMES:
+        if initial == "云":
+            return "三B"
+        if not has_r and syllable["vowel"] in _FRONT:
+            return "三A"
         return "三B"
+
     group = MC_GROUP.get(initial)
     if group is None:
         return "三"
@@ -68,8 +78,11 @@ def mc_grade(syllable: Syllable) -> str:
 
     规则：
 
-    * 没有咽化 ˤ → 三等；三等再按 -r-、声母类型和韵分辨 ``三A`` / ``三B`` /
-      ``三C`` / ``三``；
+    * 没有咽化 ˤ → 三等：
+        - 鈍音 + 重紐 AB 韻（支脂祭真仙宵幽侵鹽）：三A ⇔ 無 -r- 且主元音
+          為 e/i/ia（云母永遠三B）；其餘三B；
+        - 鈍音 + 非重紐三等 → 三C；
+        - 銳音 → 三；
     * 有 ˤ、有 -r- → 二等；但若該韻本身沒有二等（尤、侯、覃、歌等），
       按該韻的實際等第：尤 → 三，侯/覃/歌 → 一，齊/先/蕭/青/添 → 四；
     * 有 ˤ、无 -r-：
