@@ -40,6 +40,15 @@ _BASE_RHYME = {
 #: 重紐 AB 類的韻。云母沒有 A 類，遇到這些韻一律作 B 類。
 _AB_RIMES = frozenset({"支", "脂", "祭", "真", "仙", "宵", "幽", "侵", "鹽"})
 
+#: 等韻搭配：某些韻本身沒有二等，ˤ + -r- 不能機械地判作二等。
+_FIRST_ONLY = frozenset({"冬", "模", "泰", "灰", "咍", "魂", "痕", "寒", "豪", "唐", "登", "侯", "覃", "談"})
+_THIRD_ONLY = frozenset({
+    "鍾", "支", "脂", "之", "微", "魚", "虞", "祭", "廢", "真", "臻", "文",
+    "殷", "元", "仙", "宵", "陽", "清", "蒸", "尤", "幽", "侵", "鹽", "嚴", "凡",
+})
+_FOURTH_ONLY = frozenset({"齊", "先", "蕭", "青", "添"})
+_FIRST_THIRD = frozenset({"東", "歌"})
+
 
 def _san_grade(syllable: Syllable, has_r: bool) -> str:
     """三等：按 r、声母类型、韵查 A/B/C 表。"""
@@ -61,7 +70,8 @@ def mc_grade(syllable: Syllable) -> str:
 
     * 没有咽化 ˤ → 三等；三等再按 -r-、声母类型和韵分辨 ``三A`` / ``三B`` /
       ``三C`` / ``三``；
-    * 有 ˤ、有 -r- → 二等；
+    * 有 ˤ、有 -r- → 二等；但若該韻本身沒有二等（尤、侯、覃、歌等），
+      按該韻的實際等第：尤 → 三，侯/覃/歌 → 一，齊/先/蕭/青/添 → 四；
     * 有 ˤ、无 -r-：
         - 主元音 e/i/ia → 四等；
         - 主元音 ə 且声母是锐音（t、ts、s、l、r 等），韵尾为 -j/-n/-t
@@ -93,6 +103,15 @@ def mc_grade(syllable: Syllable) -> str:
     if not phar:
         return _san_grade(syllable, has_r)
     if has_r:
+        # ˤ + -r- 一般是二等，但二等只出現在有二等的韻。若該韻沒有二等，
+        # 就按該韻的實際等第：尤 → 三，侯/覃/歌 → 一，齊/先/蕭/青/添 → 四。
+        rhyme = mc_rhyme(syllable)[1]
+        if rhyme in _THIRD_ONLY:
+            return _san_grade(syllable, True)
+        if rhyme in _FIRST_ONLY or rhyme in _FIRST_THIRD:
+            return "一"
+        if rhyme in _FOURTH_ONLY:
+            return "四"
         return "二"
     if vowel in _FRONT:
         return "四"
