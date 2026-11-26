@@ -24,8 +24,8 @@ def convert_tsv(text: str) -> str:
             空行原样保留。
 
     Returns:
-        每行 ``字(音韵地位)``；没有注音的行只保留字符。
-        输入末尾有换行时，输出也保留末尾换行。
+        连续的 ``字(音韵地位)`` 文本，不含换行；没有注音的行只保留字符。
+        空行不产生内容。
 
     Raises:
         ValueError: 某行超过两列、第一列不是单个字符，或注音无法解析。
@@ -33,7 +33,6 @@ def convert_tsv(text: str) -> str:
     out: list[str] = []
     for lineno, line in enumerate(text.splitlines(), 1):
         if line == "":
-            out.append("")
             continue
 
         fields = line.split("\t")
@@ -58,7 +57,4 @@ def convert_tsv(text: str) -> str:
             raise ValueError(f"第 {lineno} 行注音 {annotation!r} 无法解析：{exc}") from exc
         out.append(f"{char}({position})")
 
-    result = "\n".join(out)
-    if text.endswith("\n"):
-        result += "\n"
-    return result
+    return "".join(out)
