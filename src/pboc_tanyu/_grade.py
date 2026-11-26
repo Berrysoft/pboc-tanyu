@@ -37,12 +37,18 @@ _BASE_RHYME = {
     "狎": "銜", "業": "嚴", "乏": "凡",
 }
 
+#: 重紐 AB 類的韻。云母沒有 A 類，遇到這些韻一律作 B 類。
+_AB_RIMES = frozenset({"支", "脂", "祭", "真", "仙", "宵", "幽", "侵", "鹽"})
+
 
 def _san_grade(syllable: Syllable, has_r: bool) -> str:
     """三等：按 r、声母类型、韵查 A/B/C 表。"""
+    initial = mc_initials(syllable)
     rhyme = mc_rhyme(syllable)[1]
     base_rhyme = _BASE_RHYME.get(rhyme, rhyme)
-    group = MC_GROUP.get(mc_initials(syllable))
+    if initial == "云" and base_rhyme in _AB_RIMES:
+        return "三B"
+    group = MC_GROUP.get(initial)
     if group is None:
         return "三"
     return _SAN.get((int(has_r), group, base_rhyme), "三")

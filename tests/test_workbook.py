@@ -51,7 +51,7 @@ def _data() -> tuple[list[tuple[object, ...]], list[tuple[object, ...]]]:
 
 _PAREN = re.compile(r"\([^)]*\)")
 _GROUP_CODE = re.compile(r"^[A-Za-z.]+")
-_TRANSLATE = str.maketrans({"帮": "幫", "群": "羣", "孃": "娘", "雲": "云"})
+_TRANSLATE = str.maketrans({"帮": "幫", "群": "羣", "娘": "孃", "雲": "云"})
 
 
 def _label_initials(label: object) -> list[str]:
@@ -242,4 +242,4 @@ def test_rhyme_rule_table() -> None:
     assert set(BASE) == {"a", "e", "i", "o", "u", "ə", "ia"}
     assert set(OVERRIDES) <= set(BASE)
     assert sum(len(table) for table in BASE.values()) == 221
-    assert sum(len(table) for table in OVERRIDES.values()) == 273
+    assert sum(len(table) for table in OVERRIDES.values()) == 306

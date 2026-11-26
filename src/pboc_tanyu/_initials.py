@@ -33,7 +33,7 @@ _MC_INITIALS: dict[str, tuple[str, ...]] = {
     "st": ("書",),
     "tʰ": ("透", "徹", "昌"),
     "d": ("定", "澄", "常"),
-    "n": ("泥", "娘", "日"),
+    "n": ("泥", "孃", "日"),
     "n̥": ("透", "徹", "書", "曉", "心"),
     "ts": ("精", "莊"),
     "tsʰ": ("清", "初"),
@@ -127,10 +127,10 @@ def _resolve(
     if initial == "s":
         return "生" if has_r else "心"
 
-    # N 系：*n' > 泥，*n > 日，*nr > 娘
+    # N 系：*n' > 泥，*n > 日，*nr > 孃
     if initial == "n":
         if has_r:
-            return "娘"
+            return "孃"
         return "泥" if phar else "日"
 
     # L 系：*l' > 定，*l > 以，*lr > 澄
