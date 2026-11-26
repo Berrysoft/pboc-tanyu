@@ -9,8 +9,9 @@ import re
 import unittest
 from pathlib import Path
 
-from pboc_tanyu import mc_initials, parse_syllable
+from pboc_tanyu import mc_grade, mc_initials, mc_rhyme, parse_syllable
 from pboc_tanyu._initials import _MC_INITIALS
+from pboc_tanyu._rhyme_rules import BASE, OVERRIDES
 
 try:
     import openpyxl
@@ -185,3 +186,50 @@ def test_prediction_accuracy_on_syllables() -> None:
     assert total == 4034
     assert correct / total >= 0.985, f"准确率 {correct}/{total}，例如 {errors[:10]}"
     assert len(errors) <= 60, f"{len(errors)} 条例外：{errors[:10]}"
+
+
+def test_grade_accuracy_on_syllables() -> None:
+    """等第推导与《小韻表》推導音韻地位中的等基本一致。"""
+    syllables, _ = _data()
+    grade_re = re.compile(r"[一二三四]")
+
+    correct = 0
+    total = 0
+    errors: list[tuple[str, int, int]] = []
+
+    for row in syllables:
+        if row[7] is None:
+            continue
+        match = grade_re.search(str(row[7]))
+        if match is None:
+            continue
+        actual = "一二三四".index(match.group()) + 1
+        predicted = mc_grade(parse_syllable(str(row[0])))
+        assert predicted in {1, 2, 3, 4}, str(row[0])
+        total += 1
+        if predicted == actual:
+            correct += 1
+        else:
+            errors.append((str(row[0]), predicted, actual))
+
+    assert total == 4034
+    assert correct / total >= 0.98, f"准确率 {correct}/{total}，例如 {errors[:10]}"
+    assert len(errors) <= 60, f"{len(errors)} 条例外：{errors[:10]}"
+
+
+def test_rhyme_coverage_on_syllables() -> None:
+    """每条《小韻表》音节都能给出合法的 (開/合, 韵)。"""
+    syllables, _ = _data()
+    for row in syllables:
+        result = mc_rhyme(parse_syllable(str(row[0])))
+        assert isinstance(result, tuple) and len(result) == 2, str(row[0])
+        assert result[0] in {"開", "合"}, str(row[0])
+        assert isinstance(result[1], str) and result[1], str(row[0])
+
+
+def test_rhyme_rule_table() -> None:
+    """韵规则为七个元音的小表：默认表 + 声母类型修正。"""
+    assert set(BASE) == {"a", "e", "i", "o", "u", "ə", "ia"}
+    assert set(OVERRIDES) <= set(BASE)
+    assert sum(len(table) for table in BASE.values()) == 221
+    assert sum(len(table) for table in OVERRIDES.values()) == 273

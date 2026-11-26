@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pboc-tanyu"
-version = "0.5.0"
-description = "Parse PBOC (基于文献的上古汉语) IPA reconstructions and map Old Chinese initials to Middle Chinese initial categories."
+version = "0.7.0"
+description = "Parse PBOC (基于文献的上古汉语) IPA reconstructions and derive Middle Chinese initials, Qieyun grade, and rhyme."
 readme = "README.md"
 requires-python = ">=3.9"
 keywords = [

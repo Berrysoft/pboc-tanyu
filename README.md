@@ -2,16 +2,18 @@
 
 解析 **PBOC**（“基于文献的上古汉语”）的 IPA 拟音，并由音节推导中古声母。
 
-包只导出两个函数：
+包只导出四个函数：
 
 ```python
-from pboc_tanyu import mc_initials, parse_syllable
+from pboc_tanyu import mc_grade, mc_initials, mc_rhyme, parse_syllable
 ```
 
 - `parse_syllable(ipa)`：把一条拟音拆成
   **声母 + 是否咽化 + 是否带 -r- + 主元音 + 韵尾 + 声调**。
 - `mc_initials(syllable)`：只接受 `parse_syllable` 返回的 `Syllable`，
   返回**一个**中古声母（传统字母，如 `幫`、`知`、`羣`）。
+- `mc_grade(syllable)`：只接受 `Syllable`，返回切韵等第 **1–4**。
+- `mc_rhyme(syllable)`：只接受 `Syllable`，返回 **`(開/合, 韵)`**。
 
 ## 安装
 
@@ -192,12 +194,92 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
 - 返回值是**单值**：数据本身多解时取规则给出的常规结果，因此会有上表
   约 1.3% 的例外。
 - 只处理 IPA 列；工作簿里的 ASCII 拼音列（`paq`、`pah`、`tsh'ymq` 等）不在范围内。
-- 本包只做切分和声母推导，不推断中古音韵地位（下一步）。
+- 本包只做切分、声母推导和等第推导，不推断完整的中古音韵地位（下一步）。
+
+## `mc_grade`
+
+给定 `Syllable`，返回切韵等第 1–4：
+
+```python
+>>> from pboc_tanyu import mc_grade, parse_syllable
+>>> mc_grade(parse_syllable("ta"))
+3
+>>> mc_grade(parse_syllable("tˤa"))
+1
+>>> mc_grade(parse_syllable("tˤra"))
+2
+>>> mc_grade(parse_syllable("tˤe"))
+4
+>>> mc_grade(parse_syllable("tˤəj"))
+4
+>>> mc_grade(parse_syllable("pˤəj"))
+1
+```
+
+规则：
+
+- **没有咽化 ˤ** → 三等（带不带 -r- 都是三等）；
+- **有 ˤ、有 -r-** → 二等；
+- **有 ˤ、无 -r-**：
+  - 主元音 `e` / `i` / `ia` → 四等；
+  - 主元音 `ə`，声母是锐音（`t`、`tʰ`、`d`、`n`、`ts`、`tsʰ`、`dz`、`s`、`l`、`l̥`、`sl`、`r`），
+    且韵尾为 `-j` / `-n` / `-t` 或去声 `-s`（不含 `-ps`）→ 四等；
+  - 其余（`a` / `o` / `u` / `ə`，或 `ə` 在钝音后）→ 一等。
+
+对《小韻表》4034 条：**3985 条正确（98.8%）**，49 条与表中的等不同。
+主要例外：
+
+| 类别 | 条数 | 说明 |
+| --- | --- | --- |
+| ˤr + o | 16 | 尤部锐音作三等、侯部牙喉音作一等，不按二等 |
+| 无 ˤ + r 的莊組/生母 | 10 | 表中作二等（`tsramʔ`、`sroŋ` 等） |
+| 无 ˤ 无 r 的 `kj`/`kʰj` | 7 | 表中作一等（`kjoŋ`、`kjunʔ` 等） |
+| 其他 | 16 | `ʔwˤa`、`r̥ˤas`、`kʰeŋh`、`lˤuk` 等零星例外 |
+
+完整名单见 [grade_mismatches.tsv](grade_mismatches.tsv)。
+
+## `mc_rhyme`
+
+给定 `Syllable`，返回切韵开合与韵：
+
+```python
+>>> from pboc_tanyu import mc_rhyme, parse_syllable
+>>> mc_rhyme(parse_syllable("tˤa"))
+('合', '模')
+>>> mc_rhyme(parse_syllable("ta"))
+('開', '魚')
+>>> mc_rhyme(parse_syllable("tˤe"))
+('開', '齊')
+>>> mc_rhyme(parse_syllable("kwa"))
+('合', '虞')
+>>> mc_rhyme(parse_syllable("tˤak"))
+('開', '鐸')
+```
+
+韵目以《切韵》为准：平/上/去用平声韵目，入声用入声韵目；
+寒合口作桓、歌合口作戈、真合口作諄。
+
+这个映射很不整齐（《源流略说》也明确说“具体的各韵部各等演化可以自己列个表”），
+所以按七个主元音拆成七组小表：
+
+- `BASE[vowel][(ˤ, -r-, 有效韵尾)]`：该元音在 ˤ / -r- / 韵尾下的默认 `(開合, 韵)`；
+- `OVERRIDES[vowel][(ˤ, -r-, 有效韵尾, 声母类型, 是否合口化声母)]`：
+  按声母类型修正的条目；
+- 声母类型：唇、舌頭、舌上、齒頭、莊、章、牙、喉、來、日、以；
+- 有效韵尾：去声的 `-s`/`-ps` 记为 `s`，其余仍用 IPA 韵尾；
+- `is_w`：`kw`、`kʰw`、`gw`、`ŋw`、`ʔw`、`w`、`ẘ` 这类合口化声母。
+
+规则表共 **221 条默认 + 273 条修正**，都在 `_rhyme_rules.py` 里，按元音分成
+七组。对《小韻表》4034 条音节，**3977 条一致（98.6%）**，57 条例外（如
+`tˤa` 的 模/虞、陽部的 陽/庚、元部的 元/仙 等）见
+[rhyme_exceptions.tsv](rhyme_exceptions.tsv)。这比逐条查表小得多，也留出了
+以后继续归纳的空间。
 
 ## 数据来源
 
 - 粗对照取自工作簿 `dict.xlsx` 的《音節表》第 2、3 行（表内版本 **26.11.21**）。
 - 解析规则与分化规则用《小韻表》4036 条音节的 IPA、聲、等、韻、尾、調六列反推并全量校验。
+- 开合/韵规则由《小韻表》的 `推導音韻地位` 归纳成七组小表，内嵌为 `_rhyme_rules.py`；运行时不依赖 Excel。
 - 清响音的方言取舍见 [Nulll《汉代方言区》](https://www.zhihu.com/question/475417874/answer/2024442059)
   与 [汉代音系](https://zh.wikipedia.org/zh-cn/%E6%BC%A2%E4%BB%A3%E9%9F%B3%E7%B3%BB)。
 

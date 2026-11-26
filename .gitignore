@@ -23,3 +23,6 @@ pytest-cache-files-*/
 # OS
 .DS_Store
 Thumbs.db
+
+# tmp
+*.tsv
