@@ -1,0 +1,52 @@
+ipa	initial	pharyngealized	has_r	vowel	coda	tone	predicted	table	category
+slak	sl	0	0	a	k	入	邪	心	sl 心/邪
+slat	sl	0	0	a	t	入	邪	心	sl 心/邪
+slip	sl	0	0	i	p	入	心	邪	sl 心/邪
+slojʔ	sl	0	0	o	j	上	邪	心	sl 心/邪
+slut	sl	0	0	u	t	入	邪	心	sl 心/邪
+sləps	sl	0	0	ə		去	邪	心	sl 心/邪
+sləs	sl	0	0	ə		去	邪	心	sl 心/邪
+l̥aw	l̥	0	0	a	w	平	書	心	l̥ 书/心
+l̥awh	l̥	0	0	a	w	去	書	心	l̥ 书/心
+l̥ok	l̥	0	0	o	k	入	書	心	l̥ 书/心
+l̥u	l̥	0	0	u		平	書	心	l̥ 书/心
+l̥us	l̥	0	0	u		去	書	心	l̥ 书/心
+l̥ə	l̥	0	0	ə		平	書	心	l̥ 书/心
+ŋ̊ˤa	ŋ̊	1	0	a		平	曉	心	ŋ̊ 晓/心
+ŋ̊ˤah	ŋ̊	1	0	a		去	曉	心	ŋ̊ 晓/心
+ŋ̊ˤar	ŋ̊	1	0	a	r	平	曉	心	ŋ̊ 晓/心
+ŋ̊ˤet	ŋ̊	1	0	e	t	入	曉	心	ŋ̊ 晓/心
+l̥oj	l̥	0	0	o	j	平	書	曉	西部方言（按东部标准舍弃）
+l̥ut	l̥	0	0	u	t	入	書	曉	西部方言（按东部标准舍弃）
+n̥ˤu	n̥	1	0	u		平	透	曉	西部方言（按东部标准舍弃）
+n̥ˤuh	n̥	1	0	u		去	透	曉	西部方言（按东部标准舍弃）
+n̥ˤuʔ	n̥	1	0	u		上	透	曉	西部方言（按东部标准舍弃）
+kan	k	0	0	a	n	平	見	章	k 颚化例外
+ket	k	0	0	e	t	入	章	見	k 颚化例外
+keŋh	k	0	0	e	ŋ	去	章	見	k 颚化例外
+kinʔ	k	0	0	i	n	上	章	見	k 颚化例外
+kit	k	0	0	i	t	入	章	見	k 颚化例外
+kiw	k	0	0	i	w	平	章	見	k 颚化例外
+kiwʔ	k	0	0	i	w	上	章	見	k 颚化例外
+ge	g	0	0	e		平	常	羣	g 颚化例外
+gew	g	0	0	e	w	平	常	羣	g 颚化例外
+geŋ	g	0	0	e	ŋ	平	常	羣	g 颚化例外
+geŋʔ	g	0	0	e	ŋ	上	常	羣	g 颚化例外
+gi	g	0	0	i		平	常	羣	g 颚化例外
+giw	g	0	0	i	w	平	常	羣	g 颚化例外
+gˤrak	g	1	1	a	k	入	匣	見	g 颚化例外
+ŋamh	ŋ	0	0	a	m	去	疑	羣	ŋ 疑/日
+ŋes	ŋ	0	0	e		去	日	疑	ŋ 疑/日
+ŋunʔ	ŋ	0	0	u	n	上	疑	羣	ŋ 疑/日
+nraŋ	n	0	1	a	ŋ	平	娘	日	n+r 日母例外
+nrəm	n	0	1	ə	m	平	娘	日	n+r 日母例外
+tʰˤaj	tʰ	1	0	a	j	平	透	定	tʰ 端/定例外
+tʰˤəp	tʰ	1	0	ə	p	入	透	端	tʰ 端/定例外
+bət	b	0	0	ə	t	入	並	滂	其他零星例外
+kʰes	kʰ	0	0	e		去	溪	昌	其他零星例外
+lriw	l	0	1	i	w	平	澄	知	其他零星例外
+pewʔ	p	0	0	e	w	上	幫	滂	其他零星例外
+sju	sj	0	0	u		平	邪	心	其他零星例外
+srewh	s	0	1	e	w	去	生	莊	其他零星例外
+tsˤraj	ts	1	1	a	j	平	莊	清	其他零星例外
+ʔwˤa	ʔw	1	0	a		平	影	云	其他零星例外

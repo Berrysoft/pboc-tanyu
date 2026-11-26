@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pboc-tanyu"
+version = "0.5.0"
+description = "Parse PBOC (基于文献的上古汉语) IPA reconstructions and map Old Chinese initials to Middle Chinese initial categories."
+readme = "README.md"
+requires-python = ">=3.9"
+keywords = [
+  "Old Chinese",
+  "Middle Chinese",
+  "historical linguistics",
+  "phonology",
+  "PBOC",
+  "上古汉语",
+  "中古音",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Text Processing :: Linguistic",
+  "Typing :: Typed",
+]
+dependencies = []
+
+[dependency-groups]
+dev = [
+  "pytest>=8",
+  "openpyxl>=3.1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pboc_tanyu"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/src",
+  "/tests",
+  "/README.md",
+  "/pyproject.toml",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
