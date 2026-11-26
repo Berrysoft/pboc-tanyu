@@ -45,12 +45,31 @@ _DUN = frozenset("幫滂並明見溪羣疑影曉匣云")
 
 #: 等韻搭配：某些韻本身沒有二等，ˤ + -r- 不能機械地判作二等。
 _FIRST_ONLY = frozenset({"冬", "模", "泰", "灰", "咍", "魂", "痕", "寒", "豪", "唐", "登", "侯", "覃", "談"})
+_SECOND_ONLY = frozenset({"江", "佳", "皆", "夬", "刪", "山", "肴", "耕", "咸", "銜"})
 _THIRD_ONLY = frozenset({
     "鍾", "支", "脂", "之", "微", "魚", "虞", "祭", "廢", "真", "臻", "文",
     "殷", "元", "仙", "宵", "陽", "清", "蒸", "尤", "幽", "侵", "鹽", "嚴", "凡",
 })
 _FOURTH_ONLY = frozenset({"齊", "先", "蕭", "青", "添"})
 _FIRST_THIRD = frozenset({"東", "歌"})
+_SECOND_THIRD = frozenset({"麻", "庚"})
+
+
+def _allowed_grades(rhyme: str) -> frozenset[str]:
+    """該韻允許的中古等。"""
+    if rhyme in _FIRST_ONLY:
+        return frozenset({"一"})
+    if rhyme in _SECOND_ONLY:
+        return frozenset({"二"})
+    if rhyme in _THIRD_ONLY:
+        return frozenset({"三"})
+    if rhyme in _FOURTH_ONLY:
+        return frozenset({"四"})
+    if rhyme in _FIRST_THIRD:
+        return frozenset({"一", "三"})
+    if rhyme in _SECOND_THIRD:
+        return frozenset({"二", "三"})
+    return frozenset()
 
 
 def _san_grade(syllable: Syllable, has_r: bool) -> str:
@@ -90,7 +109,8 @@ def mc_grade(syllable: Syllable) -> str:
         - 主元音 ə 且声母是锐音（t、ts、s、l、r 等），韵尾为 -j/-n/-t
           或去声 -s（不含 -ps）→ 四等；
         - 例外：L 系 l + 非三等 + 无 -r- + -əps 走 *-its，也归四等；
-        - 其余（a/o/u/ə，或 ə 在钝音后）→ 一等。
+        - 其余（a/o/u/ə，或 ə 在钝音后）→ 一等；
+    * 最後再按韻的等韻搭配約束：江只能二等、侯只能一等、齊只能四等。
 
     Args:
         syllable: ``parse_syllable`` 返回的 :class:`pboc_tanyu.Syllable`。
@@ -112,30 +132,51 @@ def mc_grade(syllable: Syllable) -> str:
         '三A'
     """
     initial, phar, has_r, vowel, coda, _tone, tone_marker = coerce_syllable(syllable)
+    rhyme = mc_rhyme(syllable)[1]
+    base_rhyme = _BASE_RHYME.get(rhyme, rhyme)
 
     if not phar:
-        return _san_grade(syllable, has_r)
-    if has_r:
-        # ˤ + -r- 一般是二等，但二等只出現在有二等的韻。若該韻沒有二等，
-        # 就按該韻的實際等第：尤 → 三，侯/覃/歌 → 一，齊/先/蕭/青/添 → 四。
-        rhyme = mc_rhyme(syllable)[1]
-        if rhyme in _THIRD_ONLY:
-            return _san_grade(syllable, True)
-        if rhyme in _FIRST_ONLY or rhyme in _FIRST_THIRD:
-            return "一"
-        if rhyme in _FOURTH_ONLY:
-            return "四"
-        return "二"
-    if vowel in _FRONT:
-        return "四"
+        grade = _san_grade(syllable, has_r)
+    elif has_r:
+        # ˤ + -r- 一般是二等，但二等只出現在有二等的韻。
+        if base_rhyme in _THIRD_ONLY:
+            grade = _san_grade(syllable, True)
+        elif base_rhyme in _FIRST_ONLY or base_rhyme in _FIRST_THIRD:
+            grade = "一"
+        elif base_rhyme in _FOURTH_ONLY:
+            grade = "四"
+        else:
+            grade = "二"
+    elif vowel in _FRONT:
+        grade = "四"
     # L 系 *-əps 走 *-its 一支：lˤəps > 四等齊。
-    # *-əps > *-us 只适用于 T/N/TS，L 是近音，不在此列。
-    if initial == "l" and vowel == "ə" and coda == "" and tone_marker == "ps":
-        return "四"
-    if (
+    elif initial == "l" and vowel == "ə" and coda == "" and tone_marker == "ps":
+        grade = "四"
+    elif (
         vowel == "ə"
         and initial in _SHARP
         and (coda in {"j", "n", "t"} or tone_marker == "s")
     ):
-        return "四"
-    return "一"
+        grade = "四"
+    else:
+        grade = "一"
+
+    # 這些 *-its > 四等齊 的例外，不讓韻的等韻搭配再改回去。
+    locked = (
+        grade == "四"
+        and vowel == "ə"
+        and (tone_marker == "ps" or tone_marker == "s" or coda in {"j", "n", "t"})
+    )
+
+    # 最後再受韻的等韻搭配約束：江只能二等，侯只能一等，齊只能四等。
+    if not locked:
+        allowed = _allowed_grades(base_rhyme)
+        if allowed and grade[0] not in allowed:
+            if len(allowed) == 1:
+                grade = next(iter(allowed))
+            else:
+                for candidate in ("三", "二", "一", "四"):
+                    if candidate in allowed:
+                        grade = candidate
+                        break
+    return grade
