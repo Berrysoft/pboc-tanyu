@@ -6,8 +6,8 @@ from pboc_tanyu import convert_tsv
 
 
 def test_basic() -> None:
-    assert convert_tsv("日\tnəm\n端\ttˤa\n") == "日(日開三侵平)端(端合一模平)"
-    assert convert_tsv("幫\tpe\n") == "幫(幫開三A支平)"
+    assert convert_tsv("日\tnəm\n端\ttˤa\n") == "日(日開三侵平)端(端一模平)"
+    assert convert_tsv("幫\tpe\n") == "幫(幫三A支平)"
 
 
 def test_no_annotation() -> None:
@@ -17,7 +17,7 @@ def test_no_annotation() -> None:
 
 def test_multiple_lines_and_blank() -> None:
     text = "日\tnəm\n\n月\tŋwat\n"
-    assert convert_tsv(text) == "日(日開三侵平)月(疑合三C月入)"
+    assert convert_tsv(text) == "日(日開三侵平)月(疑合三C元入)"
 
 
 def test_trailing_newline() -> None:

@@ -256,16 +256,38 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
 >>> mc_position(parse_syllable("nəm"))
 '日開三侵平'
 >>> mc_position(parse_syllable("pe"))
-'幫開三A支平'
+'幫三A支平'
 >>> mc_position(parse_syllable("tˤa"))
-'端合一模平'
+'端一模平'
+>>> mc_position(parse_syllable("bˤəŋ"))
+'並一登平'
+>>> mc_position(parse_syllable("nun"))
+'日合三真平'
 ```
 
 格式为 **声母 + 开合 + 韵等 + 韵母 + 声调**；三等按 `mc_grade` 带
-`三A`/`三B`/`三C`。例如给「日」加注：
+`三A`/`三B`/`三C`。开合直接按 AWs-363 的 `音韻地位.驗證` 所用的
+`呼韻搭配` 写：
+
+- **唇音**（幫滂並明）：不写；
+- **開合中立韻**（東冬鍾江模尤侯）：不写；
+- **分開合韻**（支脂微齊祭泰佳皆夬廢真元寒刪山先仙歌麻陽唐庚耕清青蒸登）：
+  写開或合；
+- **僅開口韻**（之魚咍臻殷痕蕭宵肴豪幽侵覃談鹽添咸銜嚴）：写開；
+- **僅合口韻**（虞灰文魂凡）：写合。
+
+另外，入声韵母改用对应的平声韵（錫 → 青、屋 → 東、鐸 → 唐、末 → 寒），
+桓、戈、諄并回寒、歌、真。
+
+> 這是 `音韻地位.驗證` 的完整寫法。`簡略描述` 會把僅開、僅合、唇音、
+> 中立韻的呼省略，但推導器解析完整描述時要求呼，所以這裡輸出完整形式。
+
+例如：
 
 ```text
 日(日開三侵平)
+幫(幫三A支平)
+端(端合一寒入)
 ```
 
 ## `mc_rhyme`
@@ -288,6 +310,9 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
 
 韵目以《切韵》为准：平/上/去用平声韵目，入声用入声韵目；
 寒合口作桓、歌合口作戈、真合口作諄。
+
+注意：`mc_rhyme` 本身仍返回入声韵目（如 錫、屋），转成 AWs-363 时由
+`mc_position` 改成平声韵（青、東）。
 
 这个映射很不整齐（《源流略说》也明确说“具体的各韵部各等演化可以自己列个表”），
 所以按七个主元音拆成七组小表：
@@ -323,7 +348,7 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
 ```python
 >>> from pboc_tanyu import convert_tsv
 >>> convert_tsv("日\tnəm\n端\ttˤa\n")
-'日(日開三侵平)端(端合一模平)'
+'日(日開三侵平)端(端一模平)'
 >>> convert_tsv("日\tnəm\n\n，\n")
 '日(日開三侵平)，'
 ```
@@ -337,7 +362,8 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
 - 粗对照取自工作簿 `dict.xlsx` 的《音節表》第 2、3 行（表内版本 **26.11.21**）。
 - 解析规则与分化规则用《小韻表》4036 条音节的 IPA、聲、等、韻、尾、調六列反推并全量校验。
 - 开合/韵规则由《小韻表》的 `推導音韻地位` 归纳成七组小表，内嵌为 `_rhyme_rules.py`；
-  三等 A/B/C 表内嵌为 `_grade_rules.py`；运行时不依赖 Excel。
+  三等 A/B/C 表内嵌为 `_grade_rules.py`；开合按 AWs-363 的 `呼韻搭配`
+  直接在 `_position.py` 里判断；运行时不依赖 Excel。
 - 清响音的方言取舍见 [Nulll《汉代方言区》](https://www.zhihu.com/question/475417874/answer/2024442059)
   与 [汉代音系](https://zh.wikipedia.org/zh-cn/%E6%BC%A2%E4%BB%A3%E9%9F%B3%E7%B3%BB)。
 
