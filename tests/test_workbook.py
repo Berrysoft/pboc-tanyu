@@ -9,7 +9,7 @@ import re
 import unittest
 from pathlib import Path
 
-from pboc_tanyu import mc_grade, mc_initials, mc_rhyme, parse_syllable
+from pboc_tanyu import mc_grade, mc_initials, mc_position, mc_rhyme, parse_syllable
 from pboc_tanyu._initials import _MC_INITIALS
 from pboc_tanyu._rhyme_rules import BASE, OVERRIDES
 
@@ -189,13 +189,14 @@ def test_prediction_accuracy_on_syllables() -> None:
 
 
 def test_grade_accuracy_on_syllables() -> None:
-    """等第推导与《小韻表》推導音韻地位中的等基本一致。"""
+    """等第推导与《小韻表》推導音韻地位中的等（含三A/B/C）基本一致。"""
     syllables, _ = _data()
-    grade_re = re.compile(r"[一二三四]")
+    grade_re = re.compile(r"([一二三四])([ABC])?")
 
     correct = 0
     total = 0
-    errors: list[tuple[str, int, int]] = []
+    errors: list[tuple[str, str, str]] = []
+    allowed = {"一", "二", "三", "三A", "三B", "三C", "四"}
 
     for row in syllables:
         if row[7] is None:
@@ -203,9 +204,9 @@ def test_grade_accuracy_on_syllables() -> None:
         match = grade_re.search(str(row[7]))
         if match is None:
             continue
-        actual = "一二三四".index(match.group()) + 1
+        actual = match.group(1) + (match.group(2) or "")
         predicted = mc_grade(parse_syllable(str(row[0])))
-        assert predicted in {1, 2, 3, 4}, str(row[0])
+        assert predicted in allowed, str(row[0])
         total += 1
         if predicted == actual:
             correct += 1
@@ -213,8 +214,17 @@ def test_grade_accuracy_on_syllables() -> None:
             errors.append((str(row[0]), predicted, actual))
 
     assert total == 4034
-    assert correct / total >= 0.98, f"准确率 {correct}/{total}，例如 {errors[:10]}"
-    assert len(errors) <= 60, f"{len(errors)} 条例外：{errors[:10]}"
+    assert correct / total >= 0.97, f"准确率 {correct}/{total}，例如 {errors[:10]}"
+    assert len(errors) <= 120, f"{len(errors)} 条例外：{errors[:10]}"
+
+
+def test_position_coverage_on_syllables() -> None:
+    """每条音节都能生成音韵地位字符串。"""
+    syllables, _ = _data()
+    for row in syllables:
+        position = mc_position(parse_syllable(str(row[0])))
+        assert isinstance(position, str) and position, str(row[0])
+        assert position[-1] in "平上去入", str(row[0])
 
 
 def test_rhyme_coverage_on_syllables() -> None:

@@ -9,35 +9,37 @@ def _s(ipa: str):
     return parse_syllable(ipa)
 
 
-CASES: list[tuple[str, int]] = [
-    # 无咽化 -> 三等（带不带 -r- 都是）
-    ("ta", 3),
-    ("tra", 3),
-    ("tia", 3),
+CASES: list[tuple[str, str]] = [
+    # 无咽化 -> 三等；三等再分 A/B/C
+    ("ta", "三"),
+    ("tra", "三"),
+    ("tia", "三"),
+    ("pe", "三A"),
+    ("praŋ", "三B"),
+    ("pa", "三C"),
     # 有咽化 + r -> 二等
-    ("tˤra", 2),
-    ("tsˤra", 2),
-    ("kˤro", 2),  # 规则值；侯部是例外
+    ("tˤra", "二"),
+    ("tsˤra", "二"),
     # 有咽化、无 r：e/i/ia -> 四等
-    ("tˤe", 4),
-    ("tˤi", 4),
-    ("l̥ˤe", 4),
+    ("tˤe", "四"),
+    ("tˤi", "四"),
+    ("l̥ˤe", "四"),
     # a/o/u -> 一等
-    ("tˤa", 1),
-    ("tˤo", 1),
-    ("tˤu", 1),
+    ("tˤa", "一"),
+    ("tˤo", "一"),
+    ("tˤu", "一"),
     # ə：锐音 + -j/-n/-t/-s -> 四等
-    ("tˤəj", 4),
-    ("tsˤən", 4),
-    ("sˤət", 4),
-    ("lˤəs", 4),
+    ("tˤəj", "四"),
+    ("tsˤən", "四"),
+    ("sˤət", "四"),
+    ("lˤəs", "四"),
     # ə：钝音或 -ps 等 -> 一等
-    ("pˤəj", 1),
-    ("kˤən", 1),
-    ("tˤəps", 1),
-    ("tˤə", 1),
+    ("pˤəj", "一"),
+    ("kˤən", "一"),
+    ("tˤəps", "一"),
+    ("tˤə", "一"),
     # L 系 *-əps 走 *-its：四等
-    ("lˤəps", 4),
+    ("lˤəps", "四"),
 ]
 
 
@@ -47,11 +49,12 @@ def test_cases() -> None:
         assert actual == expected, f"{ipa!r}: {actual} != {expected}"
 
 
-def test_returns_int_in_range() -> None:
-    for ipa in ["ta", "tˤa", "tˤra", "tˤe", "tˤəj"]:
+def test_returns_string() -> None:
+    allowed = {"一", "二", "三", "三A", "三B", "三C", "四"}
+    for ipa in ["ta", "pe", "praŋ", "pa", "tˤa", "tˤra", "tˤe", "lˤəps"]:
         result = mc_grade(_s(ipa))
-        assert isinstance(result, int)
-        assert 1 <= result <= 4
+        assert isinstance(result, str)
+        assert result in allowed
 
 
 def test_only_syllable_accepted() -> None:

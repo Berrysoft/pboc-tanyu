@@ -2,18 +2,21 @@
 
 解析 **PBOC**（“基于文献的上古汉语”）的 IPA 拟音，并由音节推导中古声母。
 
-包只导出四个函数：
+包只导出五个函数：
 
 ```python
-from pboc_tanyu import mc_grade, mc_initials, mc_rhyme, parse_syllable
+from pboc_tanyu import mc_grade, mc_initials, mc_position, mc_rhyme, parse_syllable
 ```
 
 - `parse_syllable(ipa)`：把一条拟音拆成
   **声母 + 是否咽化 + 是否带 -r- + 主元音 + 韵尾 + 声调**。
 - `mc_initials(syllable)`：只接受 `parse_syllable` 返回的 `Syllable`，
   返回**一个**中古声母（传统字母，如 `幫`、`知`、`羣`）。
-- `mc_grade(syllable)`：只接受 `Syllable`，返回切韵等第 **1–4**。
+- `mc_grade(syllable)`：只接受 `Syllable`，返回切韵等第
+  `"一"`/`"二"`/`"三"`/`"三A"`/`"三B"`/`"三C"`/`"四"`。
 - `mc_rhyme(syllable)`：只接受 `Syllable`，返回 **`(開/合, 韵)`**。
+- `mc_position(syllable)`：只接受 `Syllable`，返回
+  `声母 + 开合 + 韵等 + 韵母 + 声调` 的音韵地位字符串。
 
 ## 安装
 
@@ -194,31 +197,38 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
 - 返回值是**单值**：数据本身多解时取规则给出的常规结果，因此会有上表
   约 1.3% 的例外。
 - 只处理 IPA 列；工作簿里的 ASCII 拼音列（`paq`、`pah`、`tsh'ymq` 等）不在范围内。
-- 本包只做切分、声母推导和等第推导，不推断完整的中古音韵地位（下一步）。
+- 本包只做切分、声母、等第、开合/韵和音韵地位字符串；不负责调用 AWs-363 推导器本身。
 
 ## `mc_grade`
 
-给定 `Syllable`，返回切韵等第 1–4：
+给定 `Syllable`，返回切韵等第字符串：
 
 ```python
 >>> from pboc_tanyu import mc_grade, parse_syllable
 >>> mc_grade(parse_syllable("ta"))
-3
+'三'
 >>> mc_grade(parse_syllable("tˤa"))
-1
+'一'
 >>> mc_grade(parse_syllable("tˤra"))
-2
+'二'
 >>> mc_grade(parse_syllable("tˤe"))
-4
->>> mc_grade(parse_syllable("tˤəj"))
-4
->>> mc_grade(parse_syllable("pˤəj"))
-1
+'四'
+>>> mc_grade(parse_syllable("pe"))
+'三A'
+>>> mc_grade(parse_syllable("praŋ"))
+'三B'
+>>> mc_grade(parse_syllable("pa"))
+'三C'
 ```
 
 规则：
 
-- **没有咽化 ˤ** → 三等（带不带 -r- 都是三等）；
+- **没有咽化 ˤ** → 三等；三等再用 `(有无 -r-, 声母类型, 韵)` 查一张
+  223 条的小表，分 `三A` / `三B` / `三C` / `三`：
+  - 唇、牙、喉 + 重紐韻：无 -r- → 三A，有 -r- → 三B；
+  - 唇、牙、喉 + 非重紐韻 → 三C；
+  - 銳音（齒頭、莊、章、舌上、來、日、以）→ 三。
+  实际数据里 `三B` 无 r、章组 `三A` 等仍有交叉，小表按多数处理。
 - **有 ˤ、有 -r-** → 二等；
 - **有 ˤ、无 -r-**：
   - 主元音 `e` / `i` / `ia` → 四等；
@@ -228,17 +238,31 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
     （`lˤəps` → 四等開齊）；
   - 其余（`a` / `o` / `u` / `ə`，或 `ə` 在钝音后）→ 一等。
 
-对《小韻表》4034 条：**3986 条正确（98.8%）**，48 条与表中的等不同。
-主要例外：
+对《小韻表》4034 条：**3934 条正确（97.5%）**，100 条与表中的等不同。
+主要是三等 A/B/C 的判别（如 `paj` 表作三B、规则作三A），以及原有的
+`ʔwˤa`、`r̥ˤas`、`kʰeŋh` 等零星例外。完整名单见
+[grade_mismatches.tsv](grade_mismatches.tsv)。
 
-| 类别 | 条数 | 说明 |
-| --- | --- | --- |
-| ˤr + o | 16 | 尤部锐音作三等、侯部牙喉音作一等，不按二等 |
-| 无 ˤ + r 的莊組/生母 | 10 | 表中作二等（`tsramʔ`、`sroŋ` 等） |
-| 无 ˤ 无 r 的 `kj`/`kʰj` | 7 | 表中作一等（`kjoŋ`、`kjunʔ` 等） |
-| 其他 | 15 | `ʔwˤa`、`r̥ˤas`、`kʰeŋh`、`lˤuk` 等零星例外 |
+## `mc_position`
 
-完整名单见 [grade_mismatches.tsv](grade_mismatches.tsv)。
+给定 `Syllable`，返回 AWs-363 切韵自动推导器括号内的音韵地位：
+
+```python
+>>> from pboc_tanyu import mc_position, parse_syllable
+>>> mc_position(parse_syllable("nəm"))
+'日開三侵平'
+>>> mc_position(parse_syllable("pe"))
+'幫開三A支平'
+>>> mc_position(parse_syllable("tˤa"))
+'端合一模平'
+```
+
+格式为 **声母 + 开合 + 韵等 + 韵母 + 声调**；三等按 `mc_grade` 带
+`三A`/`三B`/`三C`。例如给「日」加注：
+
+```text
+日(日開三侵平)
+```
 
 ## `mc_rhyme`
 
@@ -285,7 +309,8 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
 
 - 粗对照取自工作簿 `dict.xlsx` 的《音節表》第 2、3 行（表内版本 **26.11.21**）。
 - 解析规则与分化规则用《小韻表》4036 条音节的 IPA、聲、等、韻、尾、調六列反推并全量校验。
-- 开合/韵规则由《小韻表》的 `推導音韻地位` 归纳成七组小表，内嵌为 `_rhyme_rules.py`；运行时不依赖 Excel。
+- 开合/韵规则由《小韻表》的 `推導音韻地位` 归纳成七组小表，内嵌为 `_rhyme_rules.py`；
+  三等 A/B/C 表内嵌为 `_grade_rules.py`；运行时不依赖 Excel。
 - 清响音的方言取舍见 [Nulll《汉代方言区》](https://www.zhihu.com/question/475417874/answer/2024442059)
   与 [汉代音系](https://zh.wikipedia.org/zh-cn/%E6%BC%A2%E4%BB%A3%E9%9F%B3%E7%B3%BB)。
 

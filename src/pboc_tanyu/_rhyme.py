@@ -23,28 +23,13 @@ IPA 韵尾。声母类型由中古声母归并而来；``is_w`` 表示 kw、kʰw
 
 from __future__ import annotations
 
+from ._groups import MC_GROUP, W_INITIALS
 from ._initials import mc_initials
 from ._parser import Syllable
 from ._rhyme_rules import BASE, OVERRIDES
 from ._syllable import coerce_syllable
 
 __all__ = ["mc_rhyme"]
-
-#: 中古声母 → 声母类型。
-_GROUP = {
-    "幫": "唇", "滂": "唇", "並": "唇", "明": "唇",
-    "端": "舌頭", "透": "舌頭", "定": "舌頭", "泥": "舌頭",
-    "知": "舌上", "徹": "舌上", "澄": "舌上", "娘": "舌上",
-    "精": "齒頭", "清": "齒頭", "從": "齒頭", "心": "齒頭", "邪": "齒頭",
-    "莊": "莊", "初": "莊", "崇": "莊", "生": "莊", "俟": "莊",
-    "章": "章", "昌": "章", "常": "章", "書": "章", "船": "章",
-    "見": "牙", "溪": "牙", "羣": "牙", "疑": "牙",
-    "曉": "喉", "匣": "喉", "影": "喉", "云": "喉",
-    "來": "來", "日": "日", "以": "以",
-}
-
-#: 合口化声母：这些声母使音节倾向合口。
-_W_INITIALS = frozenset({"kw", "kʰw", "gw", "ŋw", "ʔw", "w", "ẘ"})
 
 
 def mc_rhyme(syllable: Syllable) -> tuple[str, str]:
@@ -79,12 +64,12 @@ def mc_rhyme(syllable: Syllable) -> tuple[str, str]:
         return ("開", "齊")
 
     effective_coda = "s" if marker in {"s", "ps"} else coda
-    group = _GROUP.get(mc_initials(syllable))
+    group = MC_GROUP.get(mc_initials(syllable))
     if group is None:
         raise ValueError(f"无法归类的声母：{initial!r}")
 
     flips = (int(phar), int(has_r), effective_coda)
-    outcome = OVERRIDES.get(vowel, {}).get(flips + (group, int(initial in _W_INITIALS)))
+    outcome = OVERRIDES.get(vowel, {}).get(flips + (group, int(initial in W_INITIALS)))
     if outcome is not None:
         return outcome
 
