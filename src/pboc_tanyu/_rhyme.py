@@ -64,6 +64,7 @@ def mc_rhyme(syllable: Syllable) -> tuple[str, str]:
         return ("開", "齊")
 
     effective_coda = "s" if marker in {"s", "ps"} else coda
+
     group = RHYME_GROUP.get(mc_initials(syllable))
     if group is None:
         raise ValueError(f"无法归类的声母：{initial!r}")

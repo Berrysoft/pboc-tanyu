@@ -251,7 +251,7 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
   齊、先、蕭、青、添 只能四等。入声先按平声韵目算（覺作江、屋作東），
   例如 `sroŋ` 是生二江平、`tsrok` 是莊二江入，不是三等。
 
-对《小韻表》4034 条：**3990 条正确（98.9%）**，44 条与表中的等不同。
+对《小韻表》4034 条：**3991 条正确（98.9%）**，43 条与表中的等不同。
 主要是 `kʰənʔ` 这类 A/B 规则的零星例外，以及原有的
 `ʔwˤa`、`r̥ˤas`、`kʰeŋh` 等零星例外。完整名单见
 [grade_mismatches.tsv](grade_mismatches.tsv)。
@@ -340,7 +340,9 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
 查表小得多，也留出了以后继续归纳的空间。
 
 其中 `wap`（饁）的 H 列误作「云三C東入」，按《廣韻》訂正為云母葉韻入
-（`云開三B鹽入`）；這條不計入 H 的例外數。
+（`云開三B鹽入`）；`ʔwˤa` 平聲 H 作「云三C虞平」，與 PBOC `ʔw`（影）及
+`ˤ+a → 模` 的通則不合，按模處理（`ʔwˤah` 同）。`wap` 不計入 H 的例外數；
+`ʔwˤa` 仍列在 [rhyme_exceptions.tsv](rhyme_exceptions.tsv) 作為 H 的例外。
 
 另外，L 系 `l` + 非三等 + 无 -r- + `-əps` 单独按 *-its 一支处理，归四等開齊
 （`lˤəps`）；这是规则表之外的显式补充，因为 `-əps > -us` 只适用于 T/N/TS，
