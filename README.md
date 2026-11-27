@@ -255,7 +255,7 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
   齊、先、蕭、青、添 只能四等。入声先按平声韵目算（覺作江、屋作東），
   例如 `sroŋ` 是生二江平、`tsrok` 是莊二江入，不是三等。
 
-对《小韻表》4034 条：**3997 条正确（99.1%）**，37 条与表中的等不同。
+对《小韻表》4034 条：**3996 条正确（99.1%）**，38 条与表中的等不同。
 主要是 `kʰənʔ` 这类 A/B 规则的零星例外，以及原有的
 `ʔwˤa`、`r̥ˤas`、`kʰeŋh` 等零星例外。完整名单见
 [grade_mismatches.tsv](grade_mismatches.tsv)。
@@ -337,11 +337,16 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
 - 有效韵尾：去声的 `-s`/`-ps` 记为 `s`，其余仍用 IPA 韵尾；
 - `is_w`：`kw`、`kʰw`、`gw`、`ŋw`、`ʔw`、`w`、`ẘ` 这类合口化声母。
 
-规则表共 **221 条默认 + 306 条修正**，都在 `_rhyme_rules.py` 里，按元音分成
-七组；影母单独成组，不与曉、匣、云混在一起。对《小韻表》4034 条音节，
-**3987 条一致（98.8%）**，47 条例外（如 `tˤa` 的 模/虞、陽部的 陽/庚、
+规则表共 **221 条默认 + 309 条修正**，都在 `_rhyme_rules.py` 里，按元音分成
+七组；影、生、kj/kʰj 各自成组。对《小韻表》4034 条音节，
+**3982 条一致（98.7%）**，52 条例外（如 `tˤa` 的 模/虞、陽部的 陽/庚、
 元部的 元/仙 等）见 [rhyme_exceptions.tsv](rhyme_exceptions.tsv)。这比逐条
 查表小得多，也留出了以后继续归纳的空间。
+
+按 `is_w` 规则删除了 13 条孤立 override；其中 6 条（`ẘar`、`ŋwan`、`kwraŋʔ`、
+`kwˤəj`、`wˤən`、`kʰwˤənʔ`）的 `is_w=0` 对应项是開X，按对称补回為同韵合口，
+见 [restored_overrides.tsv](restored_overrides.tsv)。仍删除 8 条（含
+`tsʰrap` 的「初二咸」孤例），见 [deleted_overrides.tsv](deleted_overrides.tsv)。
 
 其中 `wap`（饁）的 H 列误作「云三C東入」，按《廣韻》訂正為云母葉韻入
 （`云開三B鹽入`）；`ʔwˤa` 平聲 H 作「云三C虞平」，與 PBOC `ʔw`（影）及

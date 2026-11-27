@@ -19,7 +19,7 @@ MC_GROUP: dict[str, str] = {
 W_INITIALS = frozenset({"kw", "kʰw", "gw", "ŋw", "ʔw", "w", "ẘ"})
 
 #: 韵规则用声母类型：影母单独成组，不与曉、匣、云混在一起。
-RHYME_GROUP = {**MC_GROUP, "影": "影"}
+RHYME_GROUP = {**MC_GROUP, "影": "影", "生": "生"}
 
 #: 羊系 K 声母：kj、kʰj 的 j 是声母前化成分，不是三等介音。
 KJ_INITIALS = frozenset({"kj", "kʰj"})
