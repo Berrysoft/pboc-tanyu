@@ -5,8 +5,8 @@
 
 1. 先按咽化 ˤ 和 -r- 决定基本的中古声母（T、TS、N、L、K、W 等系）；
 2. 再看主元音的前后高低和韵尾、声调：前元音 e/i 会使牙喉音颚化
-   （k > 章、g > 常、ŋ > 日、h > 書），清响音和个别齿音再按元音、
-   韵尾、声调选择具体结果。
+   （k > 章、g > 常、ŋ > 日、h > 書），但韵尾 -w/-wk 前的 k/g/ŋ 不颚化；
+   清响音和个别齿音再按元音、韵尾、声调选择具体结果。
 
 方言分歧按东部方言（中原）标准处理：n̥、l̥、r̥ 在东部方言中三等变書、
 非三等变透，西部方言则一律变曉；本包取东部，不取曉。
@@ -140,7 +140,7 @@ def _resolve(
 
     # K 系：前元音三等使 k > 章、g > 常、h > 書、ŋ > 日。
     if initial == "k":
-        if not phar and not has_r and vowel in _FRONT:
+        if not phar and not has_r and vowel in _FRONT and coda not in {"w", "wk"}:
             return "章"
         return "見"
     if initial == "kʰ":
@@ -148,7 +148,7 @@ def _resolve(
     if initial == "g":
         if phar:
             return "匣"
-        if not has_r and vowel in _FRONT:
+        if not has_r and vowel in _FRONT and coda not in {"w", "wk"}:
             return "常"
         return "羣"
     if initial == "gw":
@@ -156,7 +156,9 @@ def _resolve(
     if initial == "h":
         return "書" if (not phar and not has_r and vowel in _FRONT) else "曉"
     if initial == "ŋ":
-        return "日" if (not phar and not has_r and vowel in _FRONT) else "疑"
+        if not phar and not has_r and vowel in _FRONT and coda not in {"w", "wk"}:
+            return "日"
+        return "疑"
     if initial == "ŋw":
         return "疑"
 
