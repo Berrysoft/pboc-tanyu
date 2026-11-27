@@ -36,6 +36,8 @@ CASES: list[tuple[str, str]] = [
     ("kʰjuʔ", "一"),
     ("kjunʔ", "一"),
     ("kjəʔ", "三C"),
+    ("srap", "三"),
+    ("tsʰrap", "三"),
     ("kjə", "三C"),
     # 有咽化、无 r：e/i/ia -> 四等
     ("tˤe", "四"),

@@ -48,6 +48,9 @@ CASES: list[tuple[str, tuple[str, str]]] = [
     ("kʰjuʔ", ("開", "豪")),
     ("kjunʔ", ("合", "魂")),
     ("kjəʔ", ("開", "之")),
+    # srap 是生三鹽，tsʰrap 的初二咸是不規則讀法
+    ("srap", ("開", "葉")),
+    ("tsʰrap", ("開", "葉")),
 ]
 
 
