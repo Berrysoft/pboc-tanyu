@@ -10,7 +10,8 @@ PBOC（“基于文献的上古汉语”）的拟音形如 ``pˤrak``，可以�
 
 * 平声：无标记；
 * 上声：``ʔ``（喉塞尾）；
-* 去声：``h``（来自 *-ks）、``s``（来自 *-ts / *-ps）、``ps``（只出现在 ``əps``）；
+* 去声：``h``（来自 *-ks）、``s``（来自 *-ts / *-ps）；``ps`` 只在解析阶段
+  出现，解析结果会归一化成 ``-us``（非 L 声母）或 ``-is``（L 声母）。
 * 入声：无标记，由 ``p`` / ``t`` / ``k`` / ``wk`` 韵尾判断。
 """
 
@@ -28,7 +29,8 @@ class Syllable(TypedDict):
     """:func:`parse_syllable` 返回的字典结构。
 
     Attributes:
-        initial: 声母的 IPA 写法，例如 ``"pʰ"``、``"n̥"``、``"C.r"``。
+        initial: 声母的 IPA 写法，例如 ``"pʰ"``、``"n̥"``、``"r"``；
+            ``C.r`` 在解析时归一化成 ``r``。
         pharyngealized: 是否咽化（非三等），即拟音里是否带 ``ˤ``
             （或等价的 RTR 记号 ``◌̙``）。
         has_r: 声母后是否带 -r- 介音。
@@ -36,7 +38,8 @@ class Syllable(TypedDict):
         coda: 韵尾；开音节为空串，入声为 ``p``/``t``/``k``/``wk``。
         tone: 平、上、去、入。
         tone_marker: 声调的原始 IPA 标记：平声与入声为空串，
-            上声为 ``"ʔ"``，去声为 ``"h"``、``"s"`` 或 ``"ps"``。
+            上声为 ``"ʔ"``，去声为 ``"h"`` 或 ``"s"``；``ps`` 会被归一化成
+            ``"s"``，且 ``əps`` 的主元音改为 ``u``/``i``。
     """
 
     initial: str
@@ -203,9 +206,17 @@ def parse_syllable(ipa: str) -> Syllable:
     if tone_marker and coda in _STOP_CODAS:
         raise ValueError(f"{ipa!r} 同时带有入声韵尾和 {tone_marker!r} 声调标记")
 
+    # 早期归一化：C.r 视作 r；-əps 按 L 后 is、其他后 us 处理。
+    if initial == "C.r":
+        initial = "r"
+    if tone_marker == "ps":
+        if vowel == "ə" and coda == "":
+            vowel = "i" if initial == "l" else "u"
+        tone_marker = "s"
+
     if tone_marker == "ʔ":
         tone: Tone = "上"
-    elif tone_marker in {"h", "s", "ps"}:
+    elif tone_marker in {"h", "s"}:
         tone = "去"
     elif coda in _STOP_CODAS:
         tone = "入"

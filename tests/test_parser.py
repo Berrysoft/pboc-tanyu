@@ -39,7 +39,8 @@ CASES: list[tuple[str, dict[str, object]]] = [
     ("paʔ", _expected("p", False, False, "a", "", "上", "ʔ")),
     ("pah", _expected("p", False, False, "a", "", "去", "h")),
     ("pas", _expected("p", False, False, "a", "", "去", "s")),
-    ("pəps", _expected("p", False, False, "ə", "", "去", "ps")),
+    ("pəps", _expected("p", False, False, "u", "", "去", "s")),
+    ("lˤəps", _expected("l", True, False, "i", "", "去", "s")),
     ("pak", _expected("p", False, False, "a", "k", "入", "")),
     ("paŋ", _expected("p", False, False, "a", "ŋ", "平", "")),
     # 韵尾
@@ -60,9 +61,9 @@ CASES: list[tuple[str, dict[str, object]]] = [
     # 生母是 s + r，而不是一个独立的声母
     ("sra", _expected("s", False, True, "a", "", "平", "")),
     ("sˤra", _expected("s", True, True, "a", "", "平", "")),
-    # C.r 是一个整体符号
-    ("C.rˤa", _expected("C.r", True, False, "a", "", "平", "")),
-    ("C.ra", _expected("C.r", False, False, "a", "", "平", "")),
+    # C.r 在解析时归一化成 r
+    ("C.rˤa", _expected("r", True, False, "a", "", "平", "")),
+    ("C.ra", _expected("r", False, False, "a", "", "平", "")),
     # 咽化的严格写法：组合符号 ◌̙
     ("pa\u0319", _expected("p", True, False, "a", "", "平", "")),
     ("p\u0319a", _expected("p", True, False, "a", "", "平", "")),
@@ -78,7 +79,7 @@ def test_parse_cases() -> None:
 def test_tone_marker_is_preserved() -> None:
     assert parse_syllable("pah")["tone_marker"] == "h"
     assert parse_syllable("pas")["tone_marker"] == "s"
-    assert parse_syllable("pəps")["tone_marker"] == "ps"
+    assert parse_syllable("pəps")["tone_marker"] == "s"
     assert parse_syllable("paʔ")["tone_marker"] == "ʔ"
     assert parse_syllable("pa")["tone_marker"] == ""
     assert parse_syllable("pak")["tone_marker"] == ""

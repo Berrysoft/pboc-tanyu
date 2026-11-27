@@ -28,4 +28,4 @@ __all__ = [
     "mc_position",
     "convert_tsv",
 ]
-__version__ = "0.33.2"
+__version__ = "0.34.0"

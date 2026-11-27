@@ -113,7 +113,7 @@ def mc_grade(syllable: Syllable) -> str:
     * 有 ˤ、无 -r-：
         - 主元音 e/i/ia → 四等；
         - 主元音 ə 且声母是锐音（t、ts、s、l、r 等），韵尾为 -j/-n/-t
-          或去声 -s（不含 -ps）→ 四等；
+          或去声 -s → 四等；
         - 例外：L 系 l + 非三等 + 无 -r- + -əps 走 *-its，也归四等；
         - 其余（a/o/u/ə，或 ə 在钝音后）→ 一等；
     * 最後再按韻的等韻搭配約束：江只能二等、侯只能一等、齊只能四等。
@@ -159,8 +159,6 @@ def mc_grade(syllable: Syllable) -> str:
     elif vowel in _FRONT:
         grade = "四"
     # L 系 *-əps 走 *-its 一支：lˤəps > 四等齊。
-    elif initial == "l" and vowel == "ə" and coda == "" and tone_marker == "ps":
-        grade = "四"
     elif (
         vowel == "ə"
         and initial in _SHARP
@@ -174,7 +172,7 @@ def mc_grade(syllable: Syllable) -> str:
     locked = (
         grade == "四"
         and vowel == "ə"
-        and (tone_marker == "ps" or tone_marker == "s" or coda in {"j", "n", "t"})
+        and (tone_marker == "s" or coda in {"j", "n", "t"})
     )
 
     # 最後再受韻的等韻搭配約束：江只能二等，侯只能一等，齊只能四等。

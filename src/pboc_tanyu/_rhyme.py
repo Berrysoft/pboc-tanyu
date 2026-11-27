@@ -7,8 +7,7 @@
 * ``OPEN_SET``：开合规则表中较少的一侧，``OPEN_DEFAULT`` 是默认值；
 * ``OVERRIDES``：声母类型和特例修正。
 
-韵表按“有效韵尾”索引：去声的 ``-s`` / ``-ps`` 记为 ``"s"``，其余仍用
-IPA 韵尾。槽内 ``?`` 表示该开合下没有合法韵目；若只有一侧有韵，开合由
+韵表按“有效韵尾”索引：去声的 ``-s`` 记为 ``"s"``，其余仍用 IPA 韵尾。槽内 ``?`` 表示该开合下没有合法韵目；若只有一侧有韵，开合由
 该侧直接确定；两侧都有时才查 ``OPEN_SET`` / ``CLOSED_SET``。
 """
 
@@ -61,11 +60,7 @@ def mc_rhyme(syllable: Syllable) -> tuple[str, str]:
     """
     initial, phar, has_r, vowel, coda, _tone, marker = coerce_syllable(syllable)
 
-    # L 系 *-əps 走 *-its 一支：lˤəps > 四等開齊。
-    if initial == "l" and phar and not has_r and vowel == "ə" and coda == "" and marker == "ps":
-        return ("開", "齊")
-
-    effective_coda = "s" if marker in {"s", "ps"} else coda
+    effective_coda = "s" if marker == "s" else coda
 
     group = rhyme_group(initial, mc_initials(syllable))
     if group is None:
