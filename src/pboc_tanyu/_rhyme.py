@@ -23,7 +23,7 @@ IPA 韵尾。声母类型由中古声母归并而来；``is_w`` 表示 kw、kʰw
 
 from __future__ import annotations
 
-from ._groups import RHYME_GROUP, W_INITIALS
+from ._groups import W_INITIALS, rhyme_group
 from ._initials import mc_initials
 from ._parser import Syllable
 from ._rhyme_rules import BASE, OVERRIDES
@@ -57,7 +57,7 @@ def mc_rhyme(syllable: Syllable) -> tuple[str, str]:
         >>> mc_rhyme(parse_syllable("kwa"))
         ('合', '虞')
     """
-    initial, phar, has_r, vowel, coda, _tone, marker = coerce_syllable(syllable)
+    initial, phar, has_r, vowel, coda, tone, marker = coerce_syllable(syllable)
 
     # L 系 *-əps 走 *-its 一支：lˤəps > 四等開齊。
     if initial == "l" and phar and not has_r and vowel == "ə" and coda == "" and marker == "ps":
@@ -65,7 +65,7 @@ def mc_rhyme(syllable: Syllable) -> tuple[str, str]:
 
     effective_coda = "s" if marker in {"s", "ps"} else coda
 
-    group = RHYME_GROUP.get(mc_initials(syllable))
+    group = rhyme_group(initial, mc_initials(syllable))
     if group is None:
         raise ValueError(f"无法归类的声母：{initial!r}")
 

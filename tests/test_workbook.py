@@ -242,4 +242,4 @@ def test_rhyme_rule_table() -> None:
     assert set(BASE) == {"a", "e", "i", "o", "u", "ə", "ia"}
     assert set(OVERRIDES) <= set(BASE)
     assert sum(len(table) for table in BASE.values()) == 221
-    assert sum(len(table) for table in OVERRIDES.values()) == 305
+    assert sum(len(table) for table in OVERRIDES.values()) == 310

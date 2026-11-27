@@ -43,6 +43,9 @@ _AB_RIMES = frozenset({"支", "脂", "祭", "真", "仙", "宵", "幽", "侵", "
 #: 鈍音聲母：只有這些聲母在三等分 A/B/C。
 _DUN = frozenset("幫滂並明見溪羣疑影曉匣云")
 
+#: 羊系 K 声母：kj/kʰj 的 j 是声母前化，不表示三等。
+_KJ = frozenset({"kj", "kʰj"})
+
 #: 等韻搭配：某些韻本身沒有二等，ˤ + -r- 不能機械地判作二等。
 _FIRST_ONLY = frozenset({"冬", "模", "泰", "灰", "咍", "魂", "痕", "寒", "豪", "唐", "登", "侯", "覃", "談"})
 _SECOND_ONLY = frozenset({"江", "佳", "皆", "夬", "刪", "山", "肴", "耕", "咸", "銜"})
@@ -102,6 +105,7 @@ def mc_grade(syllable: Syllable) -> str:
           為 e/i/ia（云母永遠三B）；其餘三B；
         - 鈍音 + 非重紐三等 → 三C；
         - 銳音 → 三；
+    * 羊系 K（kj/kʰj）的 j 是聲母前化，不是三等介音：o/u → 一等，a/ə → 三等；
     * 有 ˤ、有 -r- → 二等；但若該韻本身沒有二等（尤、侯、覃、歌等），
       按該韻的實際等第：尤 → 三，侯/覃/歌 → 一，齊/先/蕭/青/添 → 四；
     * 有 ˤ、无 -r-：
@@ -131,12 +135,15 @@ def mc_grade(syllable: Syllable) -> str:
         >>> mc_grade(parse_syllable("pe"))
         '三A'
     """
-    initial, phar, has_r, vowel, coda, _tone, tone_marker = coerce_syllable(syllable)
+    initial, phar, has_r, vowel, coda, tone, tone_marker = coerce_syllable(syllable)
     rhyme = mc_rhyme(syllable)[1]
     base_rhyme = _BASE_RHYME.get(rhyme, rhyme)
 
     if not phar:
         grade = _san_grade(syllable, has_r)
+        # 羊系 K：j 是聲母前化，不是三等介音；o/u 走一等。
+        if initial in _KJ and not has_r and vowel in {"o", "u"}:
+            grade = "一"
     elif has_r:
         # ˤ + -r- 一般是二等，但二等只出現在有二等的韻。
         if base_rhyme in _THIRD_ONLY:

@@ -20,3 +20,13 @@ W_INITIALS = frozenset({"kw", "kʰw", "gw", "ŋw", "ʔw", "w", "ẘ"})
 
 #: 韵规则用声母类型：影母单独成组，不与曉、匣、云混在一起。
 RHYME_GROUP = {**MC_GROUP, "影": "影"}
+
+#: 羊系 K 声母：kj、kʰj 的 j 是声母前化成分，不是三等介音。
+KJ_INITIALS = frozenset({"kj", "kʰj"})
+
+
+def rhyme_group(pboc_initial: str, mc_initial: str) -> str | None:
+    """韵规则用的声母类型。"""
+    if pboc_initial in KJ_INITIALS:
+        return "Kj"
+    return RHYME_GROUP.get(mc_initial)
