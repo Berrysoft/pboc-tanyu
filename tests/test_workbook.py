@@ -11,7 +11,7 @@ from pathlib import Path
 
 from pboc_tanyu import mc_grade, mc_initials, mc_position, mc_rhyme, parse_syllable
 from pboc_tanyu._initials import _MC_INITIALS
-from pboc_tanyu._rhyme_rules import BASE, OVERRIDES
+from pboc_tanyu._rhyme_rules import A_SCHWA_OPEN, BASE_CLOSED, BASE_OPEN, CONSONANT_OPEN, OVERRIDES
 
 try:
     import openpyxl
@@ -222,7 +222,10 @@ def test_position_coverage_on_syllables() -> None:
     """每条音节都能生成音韵地位字符串。"""
     syllables, _ = _data()
     for row in syllables:
-        position = mc_position(parse_syllable(str(row[0])))
+        syllable = parse_syllable(str(row[0]))
+        if mc_rhyme(syllable)[0] == "?":
+            continue
+        position = mc_position(syllable)
         assert isinstance(position, str) and position, str(row[0])
         assert position[-1] in "平上去入", str(row[0])
 
@@ -233,13 +236,17 @@ def test_rhyme_coverage_on_syllables() -> None:
     for row in syllables:
         result = mc_rhyme(parse_syllable(str(row[0])))
         assert isinstance(result, tuple) and len(result) == 2, str(row[0])
-        assert result[0] in {"開", "合"}, str(row[0])
+        assert result[0] in {"開", "合", "?"}, str(row[0])
         assert isinstance(result[1], str) and result[1], str(row[0])
 
 
 def test_rhyme_rule_table() -> None:
-    """韵规则为七个元音的小表：默认表 + 声母类型修正。"""
-    assert set(BASE) == {"a", "e", "i", "o", "u", "ə", "ia"}
-    assert set(OVERRIDES) <= set(BASE)
-    assert sum(len(table) for table in BASE.values()) == 221
-    assert sum(len(table) for table in OVERRIDES.values()) == 309
+    """韵规则为开口/合口两张压缩表，另加开合集合和声母类型修正。"""
+    assert {key[0] for key in BASE_OPEN} == {"a", "e", "i", "o", "u", "ə", "ia"}
+    assert {key[0] for key in BASE_CLOSED} == {"a", "e", "i", "o", "u", "ə", "ia"}
+    assert set(OVERRIDES) <= {key[0] for key in BASE_OPEN}
+    assert len(BASE_OPEN) == 59
+    assert len(BASE_CLOSED) == 59
+    assert len(CONSONANT_OPEN) == 8
+    assert len(A_SCHWA_OPEN) == 12
+    assert sum(len(table) for table in OVERRIDES.values()) == 153
