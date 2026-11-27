@@ -342,8 +342,9 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
 规则表现在是压缩的三层：`BASE_OPEN` 和 `BASE_CLOSED` 各 59 条，键是
 `(元音, 韵尾)`，值是四个 `(ˤ, -r-)` 槽的四字字符串；`CONSONANT_OPEN` 8 条，
 处理 i/e 的合口声母；`A_SCHWA_OPEN` 12 条，处理 a/ə 的合口声母
-（W 系、`m̥`、`p`、`pʰ`、`b`、`m`）；o/u 默认合口。入声先按 `_BASE_RHYME`
-映射回平声再查开合，另有 104 条 `OVERRIDES`。
+（W 系、`m̥`、`p`、`pʰ`、`b`、`m`）；`O_U_OPEN_RIMES` 12 条整韵开口，
+`O_U_OPEN` 只留 20 条混合韵例外；o/u 默认合口。入声先按 `_BASE_RHYME`
+映射回平声再查开合，另有 104 条只存韵的 `OVERRIDES`。
 `is_w` 不再单独判断。槽内 `?` 表示该侧没有合法韵目：
 只有一侧有字时直接取该侧，两侧都是 `?` 时 `mc_rhyme` 返回 `("?", "?")`。
 

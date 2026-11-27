@@ -17,7 +17,15 @@ from __future__ import annotations
 from ._groups import rhyme_group
 from ._initials import mc_initials
 from ._parser import Syllable
-from ._rhyme_rules import A_SCHWA_OPEN, BASE_CLOSED, BASE_OPEN, CONSONANT_OPEN, OVERRIDES
+from ._rhyme_rules import (
+    A_SCHWA_OPEN,
+    BASE_CLOSED,
+    BASE_OPEN,
+    CONSONANT_OPEN,
+    O_U_OPEN,
+    O_U_OPEN_RIMES,
+    OVERRIDES,
+)
 from ._syllable import coerce_syllable
 
 __all__ = ["mc_rhyme"]
@@ -61,28 +69,32 @@ def mc_rhyme(syllable: Syllable) -> tuple[str, str]:
         raise ValueError(f"无法归类的声母：{initial!r}")
 
     flips = (int(phar), int(has_r), effective_coda)
-    outcome = OVERRIDES.get(vowel, {}).get(flips + (group,))
-    if outcome is not None:
-        return outcome
-
     idx = 2 * int(phar) + int(has_r)
     open_char = BASE_OPEN.get((vowel, effective_coda), "????")[idx]
     closed_char = BASE_CLOSED.get((vowel, effective_coda), "????")[idx]
 
-    # 只有一侧有韵时，开合由该侧直接确定；两侧都没有就返回问号。
+    # 只有一侧有韵时，开合由该侧直接确定。
     if open_char == "?" and closed_char == "?":
-        return ("?", "?")
+        rhyme = OVERRIDES.get(vowel, {}).get(flips + (group,), "?")
+        return ("?", rhyme) if rhyme != "?" else ("?", "?")
     if open_char == "?":
-        return ("合", closed_char)
-    if closed_char == "?":
-        return ("開", open_char)
-
-    if vowel in {"i", "e"}:
-        open_ = "合" if initial in CONSONANT_OPEN else "開"
-    elif vowel in {"a", "ə"}:
-        open_ = "合" if initial in A_SCHWA_OPEN else "開"
-    elif vowel in {"o", "u"}:
-        open_ = "合"
+        open_, base_rhyme = "合", closed_char
+    elif closed_char == "?":
+        open_, base_rhyme = "開", open_char
     else:
+        # 两侧都有字时，先由声母/元音确定开合。
+        if vowel in {"i", "e"}:
+            open_ = "合" if initial in CONSONANT_OPEN else "開"
+        elif vowel in {"a", "ə"}:
+            open_ = "合" if initial in A_SCHWA_OPEN else "開"
+        elif vowel in {"o", "u"}:
+            key = (initial, effective_coda, int(phar), int(has_r))
+            open_ = "開" if key in O_U_OPEN.get(vowel, ()) else "合"
+        else:
+            open_ = "開"
+        base_rhyme = open_char if open_ == "開" else closed_char
+
+    rhyme = OVERRIDES.get(vowel, {}).get(flips + (group,), base_rhyme)
+    if vowel in {"o", "u"} and rhyme in O_U_OPEN_RIMES:
         open_ = "開"
-    return (open_, open_char if open_ == "開" else closed_char)
+    return (open_, rhyme)
