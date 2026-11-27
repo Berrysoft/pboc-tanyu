@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-from ._grade_rules import SAN
+from ._grade_rules import AB_SET, BC_SET, C_SET
 from ._groups import MC_GROUP
 from ._initials import mc_initials
 from ._parser import Syllable
@@ -14,8 +14,6 @@ from ._rhyme import mc_rhyme
 from ._syllable import coerce_syllable
 
 __all__ = ["mc_grade"]
-
-_SAN = {(r, group, rhyme): label for r, group, rhyme, label in SAN}
 
 #: 三等以外的前元音：e/i 一律四等。
 _FRONT = frozenset({"e", "i", "ia"})
@@ -36,9 +34,6 @@ _BASE_RHYME = {
     "盍": "談", "葉": "鹽", "帖": "添", "洽": "咸",
     "狎": "銜", "業": "嚴", "乏": "凡",
 }
-
-#: 重紐 AB 類的韻。云母沒有 A 類，遇到這些韻一律作 B 類。
-_AB_RIMES = frozenset({"支", "脂", "祭", "真", "仙", "宵", "幽", "侵", "鹽"})
 
 #: 鈍音聲母：只有這些聲母在三等分 A/B/C。
 _DUN = frozenset("幫滂並明見溪羣疑影曉匣云")
@@ -76,23 +71,30 @@ def _allowed_grades(rhyme: str) -> frozenset[str]:
 
 
 def _san_grade(syllable: Syllable, has_r: bool) -> str:
-    """三等：重紐 AB 韻按有無 -r- 與前元音分 A/B，其餘查 A/B/C 表。"""
+    """三等：AB 重紐按有無 -r- 與前元音分 A/B，C 和無標記查小表。"""
     initial = mc_initials(syllable)
     rhyme = mc_rhyme(syllable)[1]
     base_rhyme = _BASE_RHYME.get(rhyme, rhyme)
+    if initial not in _DUN:
+        return "三"
+    group = MC_GROUP.get(initial)
+    if group is None:
+        return "三"
+    key = (group, base_rhyme)
 
-    # 鈍音 + 重紐 AB 韻：A ⇔ 無 -r- 且前元音（云母永遠 B）。
-    if initial in _DUN and base_rhyme in _AB_RIMES:
+    # AB 重紐：A ⇔ 無 -r- 且前元音；云母永遠 B。
+    if key in AB_SET:
         if initial == "云":
             return "三B"
         if not has_r and syllable["vowel"] in _FRONT:
             return "三A"
         return "三B"
-
-    group = MC_GROUP.get(initial)
-    if group is None:
-        return "三"
-    return _SAN.get((int(has_r), group, base_rhyme), "三")
+    # 蒸等 BC 類：有 -r- 為 B，無 -r- 為 C。
+    if key in BC_SET:
+        return "三B" if has_r else "三C"
+    if key in C_SET:
+        return "三C"
+    return "三"
 
 
 def mc_grade(syllable: Syllable) -> str:

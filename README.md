@@ -236,6 +236,8 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
   例如 `pe`（e）是三A，`paj`（a）是三B，`pre` / `praj`（有 -r-）也是三B。
   這條 A/B 規則在《小韻表》358 條「鈍音 + AB 韻」中對 357 條，
   唯一例外是 `kʰənʔ`（溪真上，H 作三A）。
+- A/B/C 表只存 **41 條 AB + 36 條 C + 2 條 BC（蒸）**，共 79 條；
+  其餘三等一律不帶 A/B/C 標記。
 - **羊系 K（`kj` / `kʰj`）**：`j` 是聲母前化成分，不是三等介音。
   `kj`/`kʰj` + `o`/`u` → 一等；`kj` + `a` 或 `ə` → 三等。
   例如 `kjoŋ` 一東、`kjon` 一寒、`kʰjuʔ` 一豪、`kjunʔ` 一魂；
