@@ -253,4 +253,4 @@ def test_rhyme_rule_table() -> None:
     assert len(BASE_CLOSED) == 59
     assert len(CONSONANT_OPEN) == 8
     assert len(A_SCHWA_OPEN) == 12
-    assert sum(len(table) for table in OVERRIDES.values()) == 110
+    assert sum(len(table) for table in OVERRIDES.values()) == 140

@@ -93,6 +93,8 @@ def mc_rhyme(syllable: Syllable) -> tuple[str, str]:
         base_rhyme = open_char if open_ == "開" else closed_char
 
     rhyme = OVERRIDES.get(vowel, {}).get(flips + (group,), base_rhyme)
+    if len(rhyme) == 2:
+        rhyme = rhyme[0] if open_ == "開" else rhyme[1]
     if vowel in O_U_VOWELS:
         if rhyme in O_U_OPEN_RIMES:
             open_ = "開"

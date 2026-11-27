@@ -341,11 +341,11 @@ TypeError: syllable 必须是 parse_syllable 返回的 Syllable，而不是 str
 处理 i/e 的合口声母；`A_SCHWA_OPEN` 12 条，处理 a/ə 的合口声母
 （W 系、`m̥`、`p`、`pʰ`、`b`、`m`）；`O_U_OPEN_RIMES` 12 条整韵开口；
 o/u 中 BOD（`p/pʰ/b/m` + `o/u` + `n/t/s`）默认开口，韵为文/魂时再改合口。
-入声先按 `_BASE_RHYME` 映射回平声再查开合，另有 110 条只存韵的 `OVERRIDES`。
+入声先按 `_BASE_RHYME` 映射回平声再查开合，另有 140 条只存韵的 `OVERRIDES`。
 `is_w` 不再单独判断。槽内 `?` 表示该侧没有合法韵目：
 只有一侧有字时直接取该侧，两侧都是 `?` 时 `mc_rhyme` 返回 `("?", "?")`。
 
-`OVERRIDES` 现在 110 条，只存韵；开合在 `mc_rhyme` 前段由 `CONSONANT_OPEN`、
+`OVERRIDES` 现在 140 条，只存韵；双字值如 `痕魂` 表示按开合取第一/第二字。开合在 `mc_rhyme` 前段由 `CONSONANT_OPEN`、
 `A_SCHWA_OPEN`、BOD 规则和 `O_U_OPEN_RIMES` 决定。
 
 其中 `wap`（饁）的 H 列误作「云三C東入」，按《廣韻》訂正為云母葉韻入
