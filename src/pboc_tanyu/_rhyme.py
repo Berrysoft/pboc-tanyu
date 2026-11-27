@@ -21,9 +21,12 @@ from ._rhyme_rules import (
     A_SCHWA_OPEN,
     BASE_CLOSED,
     BASE_OPEN,
+    BOD_CLOSED_RIMES,
+    BOD_CODAS,
+    BOD_INITIALS,
     CONSONANT_OPEN,
-    O_U_OPEN,
     O_U_OPEN_RIMES,
+    O_U_VOWELS,
     OVERRIDES,
 )
 from ._syllable import coerce_syllable
@@ -87,14 +90,21 @@ def mc_rhyme(syllable: Syllable) -> tuple[str, str]:
             open_ = "合" if initial in CONSONANT_OPEN else "開"
         elif vowel in {"a", "ə"}:
             open_ = "合" if initial in A_SCHWA_OPEN else "開"
-        elif vowel in {"o", "u"}:
-            key = (initial, effective_coda, int(phar), int(has_r))
-            open_ = "開" if key in O_U_OPEN.get(vowel, ()) else "合"
+        elif vowel in O_U_VOWELS:
+            bod = initial in BOD_INITIALS and effective_coda in BOD_CODAS
+            open_ = "開" if bod else "合"
         else:
             open_ = "開"
         base_rhyme = open_char if open_ == "開" else closed_char
 
     rhyme = OVERRIDES.get(vowel, {}).get(flips + (group,), base_rhyme)
-    if vowel in {"o", "u"} and rhyme in O_U_OPEN_RIMES:
-        open_ = "開"
+    if vowel in O_U_VOWELS:
+        if rhyme in O_U_OPEN_RIMES:
+            open_ = "開"
+        elif (
+            initial in BOD_INITIALS
+            and effective_coda in BOD_CODAS
+            and rhyme in BOD_CLOSED_RIMES
+        ):
+            open_ = "合"
     return (open_, rhyme)
